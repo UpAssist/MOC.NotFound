@@ -108,7 +108,8 @@ class RequestViewHelper extends AbstractViewHelper {
 	protected function appendFirstUriPartIfValidDimension(&$path) {
 		$requestPath = ltrim($this->controllerContext->getRequest()->getHttpRequest()->getUri()->getPath(), '/');
 		$matches = [];
-		preg_match(\TYPO3\Neos\Routing\FrontendNodeRoutePartHandler::DIMENSION_REQUEST_PATH_MATCHER, $requestPath, $matches);
+		$routePartHandler = $this->objectManager->get(\TYPO3\Neos\Routing\FrontendNodeRoutePartHandler::class);
+		preg_match($routePartHandler::DIMENSION_REQUEST_PATH_MATCHER, $requestPath, $matches);
 		if (!isset($matches['firstUriPart']) && !isset($matches['dimensionPresetUriSegments'])) {
 			return;
 		}
