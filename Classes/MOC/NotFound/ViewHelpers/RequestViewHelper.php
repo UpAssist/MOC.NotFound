@@ -75,6 +75,15 @@ class RequestViewHelper extends AbstractViewHelper {
 	 * @throws \Exception
 	 */
 	public function render($path = NULL) {
+        if (preg_match('/[A-Z]/', $path)) {
+            // Convert URL to lowercase
+            $lowerCasePath = strtolower($path);
+
+            if ($lowerCasePath !== $path) {
+                header('Location: ' . $lowerCasePath, true, 301);
+                exit();
+            }
+        }
 		$this->appendFirstUriPartIfValidDimension($path);
 		/** @var RequestHandler $activeRequestHandler */
 		$activeRequestHandler = $this->bootstrap->getActiveRequestHandler();
@@ -108,8 +117,7 @@ class RequestViewHelper extends AbstractViewHelper {
 	protected function appendFirstUriPartIfValidDimension(&$path) {
 		$requestPath = ltrim($this->controllerContext->getRequest()->getHttpRequest()->getUri()->getPath(), '/');
 		$matches = [];
-		$routePartHandler = $this->objectManager->get(\TYPO3\Neos\Routing\FrontendNodeRoutePartHandler::class);
-		preg_match($routePartHandler::DIMENSION_REQUEST_PATH_MATCHER, $requestPath, $matches);
+		preg_match(\TYPO3\Neos\Routing\FrontendNodeRoutePartHandler::DIMENSION_REQUEST_PATH_MATCHER, $requestPath, $matches);
 		if (!isset($matches['firstUriPart']) && !isset($matches['dimensionPresetUriSegments'])) {
 			return;
 		}
