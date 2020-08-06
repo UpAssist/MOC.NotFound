@@ -75,19 +75,20 @@ class RequestViewHelper extends AbstractViewHelper {
 	 * @throws \Exception
 	 */
 	public function render($path = NULL) {
-        if (preg_match('/[A-Z]/', $path)) {
-            // Convert URL to lowercase
-            $lowerCasePath = strtolower($path);
-
-            if ($lowerCasePath !== $path) {
-                header('Location: ' . $lowerCasePath, true, 301);
-                exit();
-            }
-        }
 		$this->appendFirstUriPartIfValidDimension($path);
 		/** @var RequestHandler $activeRequestHandler */
 		$activeRequestHandler = $this->bootstrap->getActiveRequestHandler();
 		$parentHttpRequest = $activeRequestHandler->getHttpRequest();
+        $requestPath = $parentHttpRequest->getUri()->getPath();
+        if (preg_match('/[A-Z]/', $requestPath)) {
+            // Convert URL to lowercase
+            $lowerCasePath = strtolower($requestPath);
+
+            if ($lowerCasePath !== $requestPath) {
+                header('Location: ' . $lowerCasePath, true, 301);
+                exit();
+            }
+        }
 		$uri = rtrim($parentHttpRequest->getBaseUri(), '/') . '/' . $path;
 		$httpRequest = Request::create(new Uri($uri));
 		$matchingRoute = $this->router->route($httpRequest);
